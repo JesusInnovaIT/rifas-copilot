@@ -106,10 +106,14 @@ const rifasCreadas = ref<Rifa[]>([])
 const showSuccess = ref(false)
 const successMessage = ref('')
 
+const generateUniqueId = (): string => {
+  return `${Date.now()}-${Math.random().toString(36).substring(2, 11)}`
+}
+
 const handleSubmit = () => {
   // Create a copy of the form data with unique ID
   rifasCreadas.value.push({
-    id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+    id: generateUniqueId(),
     nombre: formData.nombre,
     fecha: formData.fecha,
     numeroPremios: formData.numeroPremios,
