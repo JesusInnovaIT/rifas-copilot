@@ -65,9 +65,13 @@
         </div>
       </form>
 
+      <div v-if="showSuccess" class="success-message">
+        {{ successMessage }}
+      </div>
+
       <div v-if="rifasCreadas.length > 0" class="rifas-list">
         <h3>Rifas Creadas</h3>
-        <div v-for="(rifa, index) in rifasCreadas" :key="index" class="rifa-item">
+        <div v-for="rifa in rifasCreadas" :key="rifa.id" class="rifa-item">
           <div class="rifa-info">
             <h4>{{ rifa.nombre }}</h4>
             <p><strong>Fecha:</strong> {{ formatDate(rifa.fecha) }}</p>
@@ -84,13 +88,14 @@
 import { ref, reactive } from 'vue'
 
 interface Rifa {
+  id: string
   nombre: string
   fecha: string
   numeroPremios: number
   numeroBoletos: number
 }
 
-const formData = reactive<Rifa>({
+const formData = reactive<Omit<Rifa, 'id'>>({
   nombre: '',
   fecha: '',
   numeroPremios: 0,
@@ -98,10 +103,13 @@ const formData = reactive<Rifa>({
 })
 
 const rifasCreadas = ref<Rifa[]>([])
+const showSuccess = ref(false)
+const successMessage = ref('')
 
 const handleSubmit = () => {
-  // Create a copy of the form data
+  // Create a copy of the form data with unique ID
   rifasCreadas.value.push({
+    id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
     nombre: formData.nombre,
     fecha: formData.fecha,
     numeroPremios: formData.numeroPremios,
@@ -109,7 +117,13 @@ const handleSubmit = () => {
   })
   
   // Show success message
-  alert(`Rifa "${formData.nombre}" creada exitosamente!`)
+  successMessage.value = `Rifa "${formData.nombre}" creada exitosamente!`
+  showSuccess.value = true
+  
+  // Hide success message after 3 seconds
+  setTimeout(() => {
+    showSuccess.value = false
+  }, 3000)
   
   // Reset form
   resetForm()
@@ -221,6 +235,27 @@ h2 {
 
 .btn-secondary:hover {
   background-color: #d0d0d0;
+}
+
+.success-message {
+  background-color: #d4edda;
+  border: 1px solid #c3e6cb;
+  color: #155724;
+  padding: 1rem;
+  border-radius: 4px;
+  margin-top: 1rem;
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .rifas-list {
